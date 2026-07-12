@@ -12,27 +12,27 @@ export default async function Home() {
             {projects.length === 0 ? (
                 <p className="hint">No published projects yet.</p>
             ) : (
-                <div style={{ display: "grid", gap: "1.25rem", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
                     {projects.map((p) => (
-                        <article key={p.id} className="card">
+                        <article key={p.id} className="card" style={{ padding: "1.75rem" }}>
                             {p.thumbnailPath && (
                                 <img
                                     src={p.thumbnailPath}
                                     alt=""
-                                    style={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: "var(--radius-sm)", marginBottom: "0.85rem" }}
+                                    style={{ width: "100%", maxHeight: 440, objectFit: "cover", borderRadius: "var(--radius-sm)", marginBottom: "1.5rem" }}
                                 />
                             )}
-                            <h2 style={{ fontSize: "1.05rem", marginBottom: "0.35rem" }}>{p.title}</h2>
-                            {p.shortDescription && <p style={{ color: "var(--subtle)", fontSize: "0.9rem" }}>{p.shortDescription}</p>}
+                            <h2 style={{ fontSize: "1.6rem", marginBottom: "0.6rem" }}>{p.title}</h2>
+                            {p.shortDescription && <p style={{ color: "var(--subtle)", fontSize: "1.05rem", lineHeight: 1.6 }}>{p.shortDescription}</p>}
                             {Array.isArray(p.techStack) && p.techStack.length > 0 && (
-                                <p style={{ marginTop: "0.6rem", display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                                <p style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                                     {(p.techStack as string[]).map((t) => (
                                         <span key={t} className="badge">{t}</span>
                                     ))}
                                 </p>
                             )}
                             {(p.liveUrl || p.repoUrl) && (
-                                <p style={{ marginTop: "0.85rem", display: "flex", gap: "1rem" }}>
+                                <p style={{ marginTop: "1.25rem", display: "flex", gap: "1.5rem", fontSize: "1.05rem" }}>
                                     {p.liveUrl && <a href={p.liveUrl}>Live →</a>}
                                     {p.repoUrl && <a href={p.repoUrl}>Code →</a>}
                                 </p>
