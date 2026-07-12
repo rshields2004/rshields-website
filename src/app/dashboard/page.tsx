@@ -29,6 +29,11 @@ export default async function Dashboard() {
                     <strong>File vault</strong>
                     <div style={{ opacity: 0.7, marginTop: "0.25rem" }}>Browse and upload files</div>
                 </Link>
+
+                <Link href="/dashboard/status" style={{ display: "block", padding: "1.25rem", border: "1px solid #26233a", borderRadius: 8, textDecoration: "none" }}>
+                    <strong>Service status</strong>
+                    <div style={{ opacity: 0.7, marginTop: "0.25rem" }}>Health of dependencies</div>
+                </Link>
             </div>
         </main>
     );
