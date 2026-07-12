@@ -19,8 +19,6 @@ type ProjectRow = {
 
 type Action = (prev: unknown, formData: FormData) => Promise<{ error: string } | void>;
 
-const field: React.CSSProperties = { display: "grid", gap: "0.25rem", marginBottom: "0.9rem" };
-
 export default function ProjectForm({ action, project }: { action: Action; project?: ProjectRow }) {
     const [state, formAction, pending] = useActionState(action, null);
 
@@ -32,13 +30,13 @@ export default function ProjectForm({ action, project }: { action: Action; proje
     const techValue = Array.isArray(project?.techStack) ? (project!.techStack as string[]).join(", ") : "";
 
     return (
-        <main style={{ maxWidth: 640, margin: "2rem auto", padding: "1rem" }}>
-            <h1>{project ? "Edit project" : "New project"}</h1>
+        <main className="page" style={{ maxWidth: 640 }}>
+            <h1 style={{ fontSize: "1.6rem", marginBottom: "1.25rem" }}>{project ? "Edit project" : "New project"}</h1>
 
-            <form action={formAction}>
+            <form action={formAction} className="card">
                 {project && <input type="hidden" name="id" value={project.id} />}
 
-                <label style={field}>
+                <label className="field">
                     <span>Title *</span>
                     <input
                         name="title"
@@ -51,7 +49,7 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                     />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Slug *</span>
                     <input
                         name="slug"
@@ -61,17 +59,17 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                     />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Short description</span>
                     <input name="shortDescription" defaultValue={project?.shortDescription ?? ""} maxLength={300} />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Description</span>
                     <textarea name="description" rows={5} defaultValue={project?.description ?? ""} />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Status</span>
                     <select name="status" defaultValue={project?.status ?? "draft"}>
                         <option value="draft">draft</option>
@@ -79,48 +77,48 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                     </select>
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Category</span>
                     <input name="category" defaultValue={project?.category ?? ""} />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Tech stack (comma-separated)</span>
                     <input name="techStack" defaultValue={techValue} placeholder="Next.js, TypeScript, Drizzle" />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Repo URL</span>
                     <input name="repoUrl" type="url" defaultValue={project?.repoUrl ?? ""} />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Live URL</span>
                     <input name="liveUrl" type="url" defaultValue={project?.liveUrl ?? ""} />
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Thumbnail image</span>
                     {project?.thumbnailPath && (
                         <img
-                        src={project.thumbnailPath}
-                        alt=""
-                        style={{ maxWidth: 200, borderRadius: 6, marginBottom: "0.4rem" }}
+                            src={project.thumbnailPath}
+                            alt=""
+                            style={{ maxWidth: 200, borderRadius: "var(--radius-sm)", marginBottom: "0.4rem" }}
                         />
                     )}
                     <input type="file" name="thumbnail" accept="image/jpeg,image/png,image/webp,image/gif" />
                     <input type="hidden" name="existingThumbnail" value={project?.thumbnailPath ?? ""} />
-                    <small style={{ opacity: 0.6 }}>JPG, PNG, WebP or GIF, up to 5 MB. Leave empty to keep the current image.</small>
+                    <small className="hint">JPG, PNG, WebP or GIF, up to 5 MB. Leave empty to keep the current image.</small>
                 </label>
 
-                <label style={field}>
+                <label className="field">
                     <span>Sort order</span>
                     <input name="sortOrder" type="number" defaultValue={project?.sortOrder ?? 0} />
                 </label>
 
-                {state?.error && <p style={{ color: "#eb6f92" }}>{state.error}</p>}
+                {state?.error && <p className="error-text" style={{ marginBottom: "0.9rem" }}>{state.error}</p>}
 
-                <button type="submit" disabled={pending}>
+                <button type="submit" className="btn btn-primary" disabled={pending}>
                     {pending ? "Saving…" : project ? "Save changes" : "Create project"}
                 </button>
             </form>

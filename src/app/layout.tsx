@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Navbar from "@/components/Navbar";
+import DialogProvider from "@/components/ui/DialogProvider";
 import "./globals.css";
 
 const roboto = localFont({
@@ -20,7 +22,12 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={roboto.variable}>
-            <body>{children}</body>
+            <body>
+                <DialogProvider>
+                    <Navbar />
+                    {children}
+                </DialogProvider>
+            </body>
         </html>
     );
 }
