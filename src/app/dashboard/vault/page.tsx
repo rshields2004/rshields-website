@@ -325,7 +325,7 @@ export default function VaultPage() {
 
     return (
         <main className="page">
-            <h1 style={{ fontSize: "1.8rem", marginBottom: "0.35rem" }}>File Vault</h1>
+            <h1 className="page-title">File vault</h1>
             <p className="page-subtitle" style={{ marginTop: 0 }}>Backed by Garage</p>
 
             <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>

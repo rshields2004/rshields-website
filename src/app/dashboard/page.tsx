@@ -3,39 +3,57 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { sessionOptions, type SessionData } from "@/lib/session";
 
+/* Reuses the public index's entry language, so the private side reads as the
+   same publication rather than a separate admin tool. */
+const SECTIONS = [
+    {
+        href: "/dashboard/projects",
+        title: "Projects",
+        desc: "Create, edit and publish the entries that appear on the public index.",
+        action: "Manage",
+    },
+    {
+        href: "/dashboard/vault",
+        title: "Vault",
+        desc: "Browse, upload and organise files in the object store.",
+        action: "Browse",
+    },
+    {
+        href: "/dashboard/status",
+        title: "Status",
+        desc: "Health of the database, cache and object store behind the site.",
+        action: "Check",
+    },
+];
+
 export default async function Dashboard() {
     const session = await getIronSession<SessionData>(await cookies(), sessionOptions);
 
     return (
         <main className="page">
-            <h1 style={{ fontSize: "1.8rem", marginBottom: "0.35rem" }}>Dashboard</h1>
-            <p className="page-subtitle" style={{ marginTop: 0 }}>Signed in as {session.email}</p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <Link href="/dashboard/projects" className="card-link card-link-lg">
-                    <div>
-                        <strong>Manage projects</strong>
-                        <div className="card-desc">Create, edit, publish</div>
-                    </div>
-                    <span className="card-link-arrow">→</span>
-                </Link>
-
-                <Link href="/dashboard/vault" className="card-link card-link-lg">
-                    <div>
-                        <strong>File vault</strong>
-                        <div className="card-desc">Browse and upload files</div>
-                    </div>
-                    <span className="card-link-arrow">→</span>
-                </Link>
-
-                <Link href="/dashboard/status" className="card-link card-link-lg">
-                    <div>
-                        <strong>Service status</strong>
-                        <div className="card-desc">Health of dependencies</div>
-                    </div>
-                    <span className="card-link-arrow">→</span>
-                </Link>
+            <div className="page-header">
+                <h1 className="page-title">Console</h1>
+                <span className="page-subtitle">Signed in as {session.email}</span>
             </div>
+
+            {SECTIONS.map((s, i) => (
+                <Link key={s.href} href={s.href} className="work-entry">
+                    <span className="work-no">{String(i + 1).padStart(2, "0")}</span>
+                    <span>
+                        <span className="work-title">{s.title}</span>
+                        <span className="work-desc">{s.desc}</span>
+                    </span>
+                    <dl className="work-side">
+                        <div>
+                            <dt>Action</dt>
+                            <dd>{s.action}</dd>
+                        </div>
+                        <div>
+                            <span className="work-go">Open &#8599;</span>
+                        </div>
+                    </dl>
+                </Link>
+            ))}
         </main>
     );
 }

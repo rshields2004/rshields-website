@@ -9,7 +9,7 @@ export default async function ProjectsAdmin() {
     return (
         <main className="page">
             <div className="page-header">
-                <h1 style={{ fontSize: "1.8rem" }}>Projects</h1>
+                <h1 className="page-title">Projects</h1>
                 <Link href="/dashboard/projects/new" className="btn btn-primary btn-sm">
                     + New project
                 </Link>

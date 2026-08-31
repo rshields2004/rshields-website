@@ -30,10 +30,10 @@ export default function ProjectForm({ action, project }: { action: Action; proje
     const techValue = Array.isArray(project?.techStack) ? (project!.techStack as string[]).join(", ") : "";
 
     return (
-        <main className="page" style={{ maxWidth: 640 }}>
+        <main className="page">
             <h1 style={{ fontSize: "1.6rem", marginBottom: "1.25rem" }}>{project ? "Edit project" : "New project"}</h1>
 
-            <form action={formAction} className="card">
+            <form action={formAction} className="card form-narrow">
                 {project && <input type="hidden" name="id" value={project.id} />}
 
                 <label className="field">

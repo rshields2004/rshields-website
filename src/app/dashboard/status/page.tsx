@@ -29,7 +29,7 @@ export default function StatusPage() {
     return (
         <main className="page">
             <div className="page-header" style={{ marginBottom: "1.5rem" }}>
-                <h1 style={{ fontSize: "1.8rem" }}>Service Status</h1>
+                <h1 className="page-title">Service status</h1>
                 <button onClick={check} disabled={loading} className="btn btn-secondary btn-sm">
                     {loading ? "Checking…" : "Re-check"}
                 </button>

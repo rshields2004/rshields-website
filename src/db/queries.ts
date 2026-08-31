@@ -14,6 +14,7 @@ export async function getPublishedProjects() {
         repoUrl: projects.repoUrl,
         liveUrl: projects.liveUrl,
         thumbnailPath: projects.thumbnailPath,
+        publishedAt: projects.publishedAt,
     })
     .from(projects)
     .where(eq(projects.status, "published"))

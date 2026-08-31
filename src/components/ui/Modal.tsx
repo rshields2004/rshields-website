@@ -6,9 +6,12 @@ import { createPortal } from "react-dom";
 export default function Modal({
     onClose,
     children,
+    labelledBy,
 }: {
     onClose: () => void;
     children: ReactNode;
+    /** id of the element naming this dialog, for screen readers. */
+    labelledBy?: string;
 }) {
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -27,7 +30,7 @@ export default function Modal({
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className="modal-card" role="dialog" aria-modal="true">
+            <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
                 {children}
             </div>
         </div>,

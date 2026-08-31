@@ -1,24 +1,28 @@
-"use client";
+import Link from "next/link";
+import AsciiField from "@/components/field/AsciiField";
+import LoginForm from "@/components/LoginForm";
 
-import { useActionState } from "react";
-import { login } from "./actions";
-
+/* The home page signs in through a dialog; this route still exists because
+   `proxy.ts` redirects here when an unauthenticated request hits /dashboard,
+   and because a bookmarked /login should work. Both share LoginForm, and it
+   sits on the same field and ground as the rest of the site. */
 export default function LoginPage() {
-    const [state, formAction, pending] = useActionState(login, null);
-
     return (
-        <main className="page-narrow" style={{ marginTop: "4rem" }}>
-            <div className="card">
-                <h1 style={{ fontSize: "1.4rem", marginBottom: "1.25rem" }}>Sign in</h1>
-                <form action={formAction} style={{ display: "grid", gap: "0.9rem" }}>
-                    <input name="email" type="email" placeholder="Email" required />
-                    <input name="password" type="password" placeholder="Password" required />
-                    <button type="submit" className="btn btn-primary" disabled={pending} style={{ marginTop: "0.25rem" }}>
-                        {pending ? "Signing in…" : "Sign in"}
-                    </button>
-                    {state?.error && <p className="error-text">{state.error}</p>}
-                </form>
-            </div>
-        </main>
+        <>
+            <AsciiField />
+
+            <main className="page-narrow" style={{ marginTop: "4rem" }}>
+                <p style={{ marginBottom: "1.25rem" }}>
+                    <Link href="/" className="navbar-brand">
+                        &#8592; Rowan Shields
+                    </Link>
+                </p>
+
+                <div className="card">
+                    <div className="modal-title">Sign in</div>
+                    <LoginForm autoFocus />
+                </div>
+            </main>
+        </>
     );
 }
