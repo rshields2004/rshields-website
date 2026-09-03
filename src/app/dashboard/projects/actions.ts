@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { redirect } from "next/navigation";
-import { saveThumbnail } from "@/lib/upload";
+import { saveThumbnail, saveGalleryImages } from "@/lib/upload";
 
 export async function setProjectStatus(formData: FormData) {
     const id = Number(formData.get("id"));
@@ -102,9 +102,20 @@ export async function createProject(_prev: unknown, formData: FormData) {
         }
     }
 
+    const newImages = formData.getAll("images").filter(
+        (f): f is File => f instanceof File && f.size > 0,
+    );
+    let images: string[] = [];
+    try {
+        images = await saveGalleryImages(newImages);
+    } catch (e) {
+        return { error: e instanceof Error ? e.message : "Screenshot upload failed." };
+    }
+
     await db.insert(projects).values({
         ...d,
         thumbnailPath,
+        images,
         publishedAt: d.status === "published" ? sql`now()` : null,
     });
 
@@ -134,11 +145,32 @@ export async function updateProject(_prev: unknown, formData: FormData) {
         }
     }
 
+    let existingImages: string[] = [];
+    try {
+        existingImages = JSON.parse(String(formData.get("existingImages") ?? "[]"));
+    } catch {
+        existingImages = [];
+    }
+    const removed = new Set(formData.getAll("removeImages").map(String));
+    const kept = existingImages.filter((url) => !removed.has(url));
+
+    const newImages = formData.getAll("images").filter(
+        (f): f is File => f instanceof File && f.size > 0,
+    );
+    let uploaded: string[] = [];
+    try {
+        uploaded = await saveGalleryImages(newImages);
+    } catch (e) {
+        return { error: e instanceof Error ? e.message : "Screenshot upload failed." };
+    }
+    const images = [...kept, ...uploaded];
+
     await db
         .update(projects)
         .set({
         ...d,
         thumbnailPath,
+        images,
         updatedAt: sql`now()`,
         ...(d.status === "published" ? { publishedAt: sql`coalesce(published_at, now())` } : {}),
         })

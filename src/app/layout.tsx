@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
+import Script from "next/script";
 import DialogProvider from "@/components/ui/DialogProvider";
 import "./globals.css";
 
@@ -17,6 +18,20 @@ export const metadata: Metadata = {
     description: "Portfolio and dashboard",
 };
 
+/* Sets [data-theme] on <html> before the first paint, so there is no flash of
+   the wrong theme. `beforeInteractive` inlines this into the server HTML and
+   runs it ahead of hydration — see ThemeToggle for the click-time half of
+   this. Reads localStorage first, then falls back to the OS preference. */
+const THEME_INIT = `
+(function () {
+  try {
+    var stored = localStorage.getItem("rs-theme");
+    var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {}
+})();
+`;
+
 /* No global nav bar: the home page's masthead is its own header, and the
    dashboard carries its own. */
 export default function RootLayout({
@@ -25,7 +40,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={plexMono.variable}>
+        <html lang="en" className={plexMono.variable} suppressHydrationWarning>
+            <head>
+                <Script
+                    id="theme-init"
+                    strategy="beforeInteractive"
+                    dangerouslySetInnerHTML={{ __html: THEME_INIT }}
+                />
+            </head>
             <body>
                 <DialogProvider>{children}</DialogProvider>
             </body>

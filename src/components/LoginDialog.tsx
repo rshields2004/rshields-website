@@ -35,7 +35,7 @@ export default function LoginDialog() {
                 aria-expanded={open}
                 onClick={() => setOpen(true)}
             >
-                Login
+                Portal &#8599;
             </button>
 
             {open && (

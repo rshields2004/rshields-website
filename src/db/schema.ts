@@ -15,6 +15,7 @@ export const projects = pgTable("projects", {
 	repoUrl: varchar("repo_url", { length: 255 }),
 	liveUrl: varchar("live_url", { length: 255 }),
 	thumbnailPath: varchar("thumbnail_path", { length: 255 }),
+	images: jsonb("images").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
 	sortOrder: integer("sort_order").default(0).notNull(),
 	publishedAt: timestamp("published_at", { mode: 'string' }),
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
@@ -30,4 +31,12 @@ export const users = pgTable("users", {
 	password: varchar({ length: 255 }).notNull(),
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
 	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
+});
+
+export const contactMessages = pgTable("contact_messages", {
+	id: serial().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 255 }).notNull(),
+	message: text().notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
 });

@@ -14,6 +14,7 @@ type ProjectRow = {
     repoUrl: string | null;
     liveUrl: string | null;
     thumbnailPath: string | null;
+    images: unknown;
     sortOrder: number;
 };
 
@@ -28,6 +29,16 @@ export default function ProjectForm({ action, project }: { action: Action; proje
 
     const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     const techValue = Array.isArray(project?.techStack) ? (project!.techStack as string[]).join(", ") : "";
+    const images: string[] = Array.isArray(project?.images) ? (project!.images as string[]) : [];
+    const [removed, setRemoved] = useState<Set<string>>(new Set());
+    const toggleRemove = (url: string) => {
+        setRemoved((prev) => {
+            const next = new Set(prev);
+            if (next.has(url)) next.delete(url);
+            else next.add(url);
+            return next;
+        });
+    };
 
     return (
         <main className="page">
@@ -39,6 +50,7 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                 <label className="field">
                     <span>Title *</span>
                     <input
+                        type="text"
                         name="title"
                         value={title}
                         onChange={(e) => {
@@ -52,6 +64,7 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                 <label className="field">
                     <span>Slug *</span>
                     <input
+                        type="text"
                         name="slug"
                         value={slug}
                         onChange={(e) => { setSlug(e.target.value); setSlugTouched(true); }}
@@ -61,7 +74,7 @@ export default function ProjectForm({ action, project }: { action: Action; proje
 
                 <label className="field">
                     <span>Short description</span>
-                    <input name="shortDescription" defaultValue={project?.shortDescription ?? ""} maxLength={300} />
+                    <input type="text" name="shortDescription" defaultValue={project?.shortDescription ?? ""} maxLength={300} />
                 </label>
 
                 <label className="field">
@@ -79,12 +92,12 @@ export default function ProjectForm({ action, project }: { action: Action; proje
 
                 <label className="field">
                     <span>Category</span>
-                    <input name="category" defaultValue={project?.category ?? ""} />
+                    <input type="text" name="category" defaultValue={project?.category ?? ""} />
                 </label>
 
                 <label className="field">
                     <span>Tech stack (comma-separated)</span>
-                    <input name="techStack" defaultValue={techValue} placeholder="Next.js, TypeScript, Drizzle" />
+                    <input type="text" name="techStack" defaultValue={techValue} placeholder="Next.js, TypeScript, Drizzle" />
                 </label>
 
                 <label className="field">
@@ -109,6 +122,45 @@ export default function ProjectForm({ action, project }: { action: Action; proje
                     <input type="file" name="thumbnail" accept="image/jpeg,image/png,image/webp,image/gif" />
                     <input type="hidden" name="existingThumbnail" value={project?.thumbnailPath ?? ""} />
                     <small className="hint">JPG, PNG, WebP or GIF, up to 5 MB. Leave empty to keep the current image.</small>
+                </label>
+
+                <label className="field">
+                    <span>Screenshots</span>
+                    {images.length > 0 && (
+                        <div className="screenshot-grid">
+                            {images.map((url) => (
+                                <label key={url} className="screenshot-item">
+                                    <img src={url} alt="" />
+                                    <span>
+                                        <input
+                                            type="checkbox"
+                                            checked={removed.has(url)}
+                                            onChange={() => toggleRemove(url)}
+                                        />
+                                        Remove
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                    <input
+                        type="file"
+                        name="images"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        multiple
+                    />
+                    <input
+                        type="hidden"
+                        name="existingImages"
+                        value={JSON.stringify(images)}
+                    />
+                    {[...removed].map((url) => (
+                        <input key={url} type="hidden" name="removeImages" value={url} />
+                    ))}
+                    <small className="hint">
+                        Add screenshots for the featured-project carousel. Widescreen
+                        images work best.
+                    </small>
                 </label>
 
                 <label className="field">

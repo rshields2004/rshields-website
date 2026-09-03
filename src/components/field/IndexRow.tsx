@@ -31,16 +31,29 @@ export default function IndexRow({
         );
     }
 
+    const isInteractiveChild = (target: EventTarget | null) =>
+        target instanceof Element && Boolean(target.closest("a, button, input, select, textarea"));
+
+    const openProject = () => window.open(href, "_blank", "noopener,noreferrer");
+
     return (
-        <a
+        <div
             className={className}
             style={style}
-            href={href}
-            target="_blank"
-            rel="noreferrer noopener"
             onMouseEnter={ripple}
+            role="link"
+            tabIndex={0}
+            onClick={(event) => {
+                if (!isInteractiveChild(event.target)) openProject();
+            }}
+            onKeyDown={(event) => {
+                if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    openProject();
+                }
+            }}
         >
             {children}
-        </a>
+        </div>
     );
 }

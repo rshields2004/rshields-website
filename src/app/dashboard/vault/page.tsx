@@ -326,8 +326,7 @@ export default function VaultPage() {
     return (
         <main className="page">
             <h1 className="page-title">File vault</h1>
-            <p className="page-subtitle" style={{ marginTop: 0 }}>Backed by Garage</p>
-
+            <br />
             <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
                 <label className="btn btn-primary btn-sm" style={{ cursor: "pointer" }}>
                     Upload files

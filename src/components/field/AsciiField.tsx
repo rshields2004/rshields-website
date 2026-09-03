@@ -24,8 +24,16 @@ const DRIFT = 1.9; // world units per second the terrain slides past
 const MAX_RIPPLES = 4;
 const BASE_ALPHA = 0.55; // resting ink alpha for the glyphs
 
-const INK = new THREE.Color("#9b9797"); // redacted grey — the unhighlighted field
-const ACCENT = new THREE.Color("#0b5e8a"); // crests take trace blue
+/* Read live rather than hardcoded, so flipping the theme re-colours the field
+   without remounting the WebGL context — see the "theme:change" listener
+   below. Defaults match the light theme in case this runs before the custom
+   properties are attached (it never should, but a stale value beats a
+   crash). */
+function readFieldColor(varName: string, fallback: string): THREE.Color {
+    if (typeof window === "undefined") return new THREE.Color(fallback);
+    const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return new THREE.Color(v || fallback);
+}
 
 const SCENE_VERT = /* glsl */ `
   uniform float uTime;
@@ -139,6 +147,9 @@ export default function AsciiField() {
             uRipples: { value: ripples },
         };
 
+        const fieldInk = readFieldColor("--field-ink", "#9b9797");
+        const fieldAccent = readFieldColor("--field-accent", "#0b5e8a");
+
         const terrain = new THREE.Mesh(
             new THREE.PlaneGeometry(150, 130, 220, 190),
             new THREE.ShaderMaterial({
@@ -165,8 +176,8 @@ export default function AsciiField() {
             uCell: { value: CELL_PX },
             uCount: { value: RAMP.length },
             uBase: { value: BASE_ALPHA },
-            uInk: { value: INK },
-            uAccent: { value: ACCENT },
+            uInk: { value: fieldInk },
+            uAccent: { value: fieldAccent },
         };
 
         const asciiScene = new THREE.Scene();
@@ -233,6 +244,12 @@ export default function AsciiField() {
         };
         window.addEventListener("field:ripple", onRipple as EventListener);
 
+        const onThemeChange = () => {
+            fieldInk.set(readFieldColor("--field-ink", "#9b9797"));
+            fieldAccent.set(readFieldColor("--field-accent", "#0b5e8a"));
+        };
+        window.addEventListener("theme:change", onThemeChange);
+
         /* Scroll swings the camera down over the terrain. -------------------- */
         let camTarget = 0;
         let camEase = 0;
@@ -282,6 +299,7 @@ export default function AsciiField() {
             cancelAnimationFrame(raf);
             window.removeEventListener("resize", resize);
             window.removeEventListener("field:ripple", onRipple as EventListener);
+            window.removeEventListener("theme:change", onThemeChange);
             window.removeEventListener("scroll", onScroll);
             document.removeEventListener("visibilitychange", onVisibility);
             timer.disconnect();

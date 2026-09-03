@@ -6,40 +6,15 @@ import { sessionOptions, type SessionData } from "@/lib/session";
 import Image from "next/image";
 import { getPublishedProjects } from "@/db/queries";
 import AsciiField from "@/components/field/AsciiField";
-import IndexRow from "@/components/field/IndexRow";
+import FeaturedProjectCard from "@/components/FeaturedProjectCard";
+import SocialLinks from "@/components/SocialLinks";
+import ContactForm from "@/components/ContactForm";
 import { findPortrait } from "@/lib/portrait";
 import LoginDialog from "@/components/LoginDialog";
+import ThemeToggle from "@/components/ThemeToggle";
 
 /** `.rise` reads its delay from `--d`, so the page deals itself out. */
 const stagger = (i: number) => ({ "--d": `${i * 45}ms` }) as React.CSSProperties;
-
-/* Column headers are scaffolding until there are enough rows to justify them,
-   so the index only becomes a table at volume. */
-const TABLE_THRESHOLD = 4;
-
-/* What actually runs the site. Mirrors the services in `lib/health.ts`. */
-const INFRA = [
-    {
-        role: "Application",
-        name: "Next.js 16",
-        desc: "React 19 server components, rendered on demand.",
-    },
-    {
-        role: "Database",
-        name: "PostgreSQL",
-        desc: "Projects and sessions, accessed through Drizzle.",
-    },
-    {
-        role: "Cache",
-        name: "Redis",
-        desc: "Ephemeral state and health probes.",
-    },
-    {
-        role: "Object store",
-        name: "S3-compatible",
-        desc: "File vault, presigned and multipart uploads.",
-    },
-];
 
 export default async function Home() {
     /* Removing the global nav removed this page's only cookies() call, which
@@ -57,15 +32,13 @@ export default async function Home() {
     const isLoggedIn = Boolean(session.isLoggedIn);
 
     const projects = await getPublishedProjects();
-    const year = new Date().getFullYear();
-    const asTable = projects.length >= TABLE_THRESHOLD;
     const portrait = findPortrait();
 
     const rows = projects.map((p, i) => {
-        const href = p.liveUrl || p.repoUrl || undefined;
         const stack = Array.isArray(p.techStack) ? (p.techStack as string[]) : [];
         const published = p.publishedAt ? new Date(p.publishedAt).getFullYear() : null;
-        return { p, i, href, stack, published };
+        const images = Array.isArray(p.images) ? (p.images as string[]) : [];
+        return { p, i, stack, published, images };
     });
 
     return (
@@ -75,21 +48,34 @@ export default async function Home() {
             <main className="home">
                 <header className="masthead">
                     <div className="masthead-top">
-                        <span className="label">Portfolio</span>
-                        {isLoggedIn ? (
-                            <Link
-                                href="/dashboard"
-                                className="btn btn-secondary btn-sm"
-                            >
-                                Dashboard &#8594;
+                        <nav className="masthead-nav">
+                            <Link href="/" className="navbar-link">
+                                Home
                             </Link>
-                        ) : (
-                            <LoginDialog />
-                        )}
+                            <a href="#work" className="navbar-link">
+                                Projects
+                            </a>
+                            <a href="#contact" className="navbar-link">
+                                Contact
+                            </a>
+                        </nav>
+                        <div className="masthead-actions">
+                            <ThemeToggle />
+                            {isLoggedIn ? (
+                                <Link
+                                    href="/dashboard"
+                                    className="btn btn-secondary btn-sm"
+                                >
+                                    Portal &#8599;
+                                </Link>
+                            ) : (
+                                <LoginDialog />
+                            )}
+                        </div>
                     </div>
 
                     <div className="masthead-main">
-                        <div>
+                        <div className="masthead-intro">
                             <h1 className="rise">
                                 <span>Rowan</span>
                                 <span className="surname">Shields</span>
@@ -100,6 +86,10 @@ export default async function Home() {
                                 hardware I own — application, database, cache and object
                                 store.
                             </p>
+
+                            <div className="masthead-social rise" style={stagger(2)}>
+                                <SocialLinks />
+                            </div>
                         </div>
 
                         <div className="portrait rise" style={stagger(1)}>
@@ -116,29 +106,11 @@ export default async function Home() {
                             )}
                         </div>
                     </div>
-
-                    <dl className="masthead-meta rise" style={stagger(2)}>
-                        <div>
-                            <dt>Index</dt>
-                            <dd>
-                                {projects.length}{" "}
-                                {projects.length === 1 ? "entry" : "entries"}, published
-                            </dd>
-                        </div>
-                        <div>
-                            <dt>Hosting</dt>
-                            <dd>Self-hosted</dd>
-                        </div>
-                        <div>
-                            <dt>Year</dt>
-                            <dd>{year}</dd>
-                        </div>
-                    </dl>
                 </header>
 
                 <section className="work" id="work">
                     <div className="work-title-row">
-                        <span className="label">Selected work</span>
+                        <span className="label">Featured projects</span>
                         <span className="label">
                             {projects.length.toString().padStart(2, "0")} total
                         </span>
@@ -146,104 +118,48 @@ export default async function Home() {
 
                     {projects.length === 0 ? (
                         <p className="work-empty">No published projects yet.</p>
-                    ) : asTable ? (
-                        <>
-                            <div className="index-head">
-                                <span>No.</span>
-                                <span>Project</span>
-                                <span>Stack</span>
-                                <span>Year</span>
-                                <span />
-                            </div>
-                            {rows.map(({ p, i, href, stack, published }) => (
-                                <IndexRow
-                                    key={p.id}
-                                    href={href}
-                                    className="index-row rise"
-                                    style={stagger(i + 3)}
-                                >
-                                    <span className="index-no">
-                                        {String(i + 1).padStart(2, "0")}
-                                    </span>
-                                    <span className="index-name">
-                                        {p.title}
-                                        {p.shortDescription && (
-                                            <span className="index-desc">
-                                                {p.shortDescription}
-                                            </span>
-                                        )}
-                                    </span>
-                                    <span className="index-stack">
-                                        {stack.map((t) => (
-                                            <span key={t}>{t}</span>
-                                        ))}
-                                    </span>
-                                    <span className="index-year">{published ?? "—"}</span>
-                                    <span className="index-arrow" aria-hidden="true">
-                                        &#8599;
-                                    </span>
-                                </IndexRow>
-                            ))}
-                        </>
                     ) : (
-                        rows.map(({ p, i, href, stack, published }) => (
-                            <IndexRow
+                        <div className="featured-projects">
+                        {rows.map(({ p, i, stack, published, images }) => (
+                            <FeaturedProjectCard
                                 key={p.id}
-                                href={href}
-                                className="work-entry rise"
+                                title={p.title}
+                                shortDescription={p.shortDescription}
+                                description={p.description}
+                                techStack={stack}
+                                images={images}
+                                liveUrl={p.liveUrl}
+                                repoUrl={p.repoUrl}
+                                published={published}
+                                reversed={Boolean(i % 2)}
                                 style={stagger(i + 3)}
-                            >
-                                <span className="work-no">
-                                    {String(i + 1).padStart(2, "0")}
-                                </span>
-
-                                <span>
-                                    <span className="work-title">{p.title}</span>
-                                    {p.shortDescription && (
-                                        <span className="work-desc">
-                                            {p.shortDescription}
-                                        </span>
-                                    )}
-                                </span>
-
-                                <dl className="work-side">
-                                    {stack.length > 0 && (
-                                        <div>
-                                            <dt>Stack</dt>
-                                            <dd>{stack.join(" / ")}</dd>
-                                        </div>
-                                    )}
-                                    <div>
-                                        <dt>Year</dt>
-                                        <dd>{published ?? "—"}</dd>
-                                    </div>
-                                    {href && (
-                                        <div>
-                                            <span className="work-go">
-                                                {p.liveUrl ? "Visit" : "Source"} &#8599;
-                                            </span>
-                                        </div>
-                                    )}
-                                </dl>
-                            </IndexRow>
-                        ))
+                            />
+                        ))}
+                        </div>
                     )}
                 </section>
 
-                <section className="infra" id="infrastructure">
+                <section className="contact" id="contact">
                     <div className="work-title-row">
-                        <span className="label">Infrastructure</span>
-                        <span className="label">What runs this</span>
+                        <span className="label">Contact</span>
+                        <span className="label">Let&rsquo;s talk</span>
                     </div>
 
-                    <div className="infra-grid">
-                        {INFRA.map((s) => (
-                            <div className="infra-item" key={s.role}>
-                                <span className="label">{s.role}</span>
-                                <span className="infra-name">{s.name}</span>
-                                <span className="infra-desc">{s.desc}</span>
-                            </div>
-                        ))}
+                    <div className="contact-layout">
+                        <div className="contact-intro">
+                            <p className="contact-lede">
+                                Got something you&rsquo;re building, or just want to
+                                talk shop?
+                            </p>
+                            <a
+                                className="contact-direct"
+                                href="mailto:rshields04@outlook.com"
+                            >
+                                rshields04@outlook.com &#8599;
+                            </a>
+                        </div>
+
+                        <ContactForm />
                     </div>
                 </section>
 
@@ -251,7 +167,7 @@ export default async function Home() {
                     <span>Rowan Shields</span>
                     <span>Portfolio</span>
                     <span>Self-hosted</span>
-                    <span>&copy; {year}</span>
+                    <span>&copy; {new Date().getFullYear()}</span>
                 </footer>
             </main>
         </>

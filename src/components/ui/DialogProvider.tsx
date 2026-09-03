@@ -60,6 +60,7 @@ export default function DialogProvider({ children }: { children: ReactNode }) {
                     {state.kind === "prompt" && (
                         <input
                             autoFocus
+                            type="text"
                             className="input"
                             value={inputValue}
                             placeholder={state.options.placeholder}

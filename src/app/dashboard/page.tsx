@@ -24,6 +24,12 @@ const SECTIONS = [
         desc: "Health of the database, cache and object store behind the site.",
         action: "Check",
     },
+    {
+        href: "/dashboard/messages",
+        title: "Messages",
+        desc: "Submissions from the public site's contact form.",
+        action: "Review",
+    },
 ];
 
 export default async function Dashboard() {

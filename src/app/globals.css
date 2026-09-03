@@ -42,14 +42,18 @@
 
   /* Type ---------------------------------------------------------------- */
   --fs-label: 11px;
-  --fs-body: 14px;
-  --fs-title: clamp(1.75rem, 2.2vw, 2.25rem);
+  --fs-body: 15px;
+  --fs-title: clamp(1.625rem, 2vw, 2rem);
   --fs-title-sm: clamp(1.375rem, 1.6vw, 1.625rem);
-  --fs-display: clamp(2.5rem, 7.6vw, 7.5rem);
+  --fs-display: clamp(2.25rem, 6.4vw, 6rem); /* sized for a shared column, not the full sheet */
   --track-label: 0.1em;
+  /* One deliberate step above body, used only for the masthead strapline —
+     the single paragraph that has to sound like a person rather than a row
+     in a table. */
+  --fs-lede: 17px;
 
   /* Structure ----------------------------------------------------------- */
-  --measure: 1680px;
+  --measure: 1200px;
   --sheet-pad: 32px;
   --rule-w: 2px;
   --hair-w: 1px;
@@ -88,6 +92,43 @@
   --foam: var(--blue);
   --foam-hover: var(--blue-pressed);
   --iris: var(--blue);
+
+  /* Decorative only — see the dark-theme block for why these are separate
+     from the text-bearing tokens. */
+  --field-ink: #9b9797;
+  --field-accent: #0b5e8a;
+}
+
+:root[data-theme="dark"] {
+  /* Dark theme. Same roles as the light palette, contrast-checked the same
+     way: body-size text >=4.5:1, large type / UI >=3:1, computed against
+     every ground it actually sits on (see the light-palette audit above). */
+  --paper: #1c1b1a;        /* sheet surface — slightly elevated above --bg */
+  --bg: #121212;           /* page ground, darkest */
+  --ink: #f2f0ee;          /* headings, rules, footer field */
+  --blue: #3f9fd6;         /* trace blue — brighter for a dark ground */
+  --neutral-500: #6e6a66;  /* redacted grey — unhighlighted bars, disabled */
+
+  --panel: #242220;        /* neutral-200 */
+  --panel-2: #37342f;      /* neutral-300 — sub-block rules */
+  --ink-2: #a9a5a1;        /* neutral-700 — secondary text */
+  --blue-wash: #132530;    /* highlight wash */
+  --blue-pressed: #3390c4; /* pressed state */
+  --blue-deep: #7cc4ec;    /* body-size links — lighter reads on a dark ground */
+
+  --ink-3: #a9a5a1;
+
+  --ok: #2fa66b;
+  --ok-wash: #103821;
+  --bad: #e5564a;
+  --bad-wash: #3a1512;
+  --warn: #d9a441;
+
+  /* Decorative only — the ASCII field's resting/crest colours. Not text, so
+     not contrast-bound; kept separate from --neutral-500/--blue so the field
+     can stay a quiet watermark regardless of what the text tokens are doing. */
+  --field-ink: #55524d;
+  --field-accent: #3f9fd6;
 }
 
 @theme inline {
@@ -126,7 +167,7 @@ body {
   color: var(--ink);
   font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--fs-body);
-  line-height: 1.55;
+  line-height: 1.62;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -187,7 +228,6 @@ img { display: block; max-width: 100%; }
 .table th,
 .work-no,
 .work-side dt,
-.masthead-meta dt,
 .infra-item .label,
 .index-no,
 .index-stack,
@@ -518,6 +558,38 @@ input[type="file"] {
   color: var(--ink-2);
 }
 
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.screenshot-item {
+  display: block;
+  border: var(--hair-w) solid var(--ink);
+  cursor: pointer;
+}
+
+.screenshot-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.screenshot-item span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--bad);
+  border-top: var(--hair-w) solid var(--ink);
+}
+
 .error-text {
   color: var(--bad);
   padding: 8px 10px;
@@ -774,7 +846,7 @@ input[type="file"] {
    the text off it, and the gaps between sheets are where the field shows. */
 .masthead,
 .work,
-.infra,
+.contact,
 .colophon {
   background: var(--paper);
   padding-inline: var(--sheet-pad);
@@ -784,7 +856,7 @@ input[type="file"] {
 /* ---------- Masthead ---------- */
 
 .masthead {
-  padding-block: 24px 44px;
+  padding-block: 40px 64px;
 }
 
 /* The masthead is the page header now — this strip carries what little chrome
@@ -794,22 +866,49 @@ input[type="file"] {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  flex-wrap: wrap;
   padding-bottom: 22px;
-  margin-bottom: 48px;
+  margin-bottom: 60px;
   border-bottom: var(--hair-ink);
 }
 
+.masthead-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: -10px; /* optically align the first link with the sheet edge */
+}
+
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The portrait is wide enough, and the gap small enough, that the two blocks
+   read as one composition. At the old 1680px measure with a 320px portrait
+   this row left a 944px hole down the middle. */
 .masthead-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 56px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 72px;
+  align-items: center;
+}
+
+.masthead-intro {
+  display: grid;
+  gap: 36px;
+  align-content: center;
+  /* Keeps the rule and the button row aligned to the text rather than
+     trailing off across the whole column. */
+  max-width: 640px;
 }
 
 /* Square, hard-edged, ruled — a plate like everything else on the page. */
 .portrait {
   position: relative;
-  width: 320px;
+  width: 100%;
+  max-width: 380px;
   aspect-ratio: 1;
   border: var(--rule);
   background: var(--panel);
@@ -851,39 +950,34 @@ input[type="file"] {
 }
 
 .strapline {
-  margin-top: 36px;
-  max-width: 62ch;
-  font-size: var(--fs-body);
+  max-width: 52ch;
+  font-size: var(--fs-lede);
+  line-height: 1.6;
   color: var(--ink);
 }
 
-/* The meta row gets its own air above the rule rather than being pinned to
-   the strapline. */
-.masthead-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 28px 40px;
-  margin-top: 72px;
-  padding-bottom: 28px;
-  border-bottom: var(--rule);
+/* Same rhythm the meta row used to carry — its own air, then the rule that
+   closes the masthead off from the section below. */
+.masthead-social {
+  padding-top: 32px;
+  border-top: var(--hair-ink);
 }
 
-.masthead-meta dt {
-  margin-bottom: 6px;
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.masthead-meta dd {
-  margin: 0;
-  font-size: var(--fs-body);
-  color: var(--ink);
+.social-btn {
+  gap: 8px;
 }
 
 /* ---------- Work ---------- */
 
 .work {
-  /* Tightened from the previous ~340px of dead air. */
-  margin-top: 72px;
-  padding-block: 36px;
+  margin-top: 88px;
+  padding-block: 48px;
 }
 
 .work-title-row {
@@ -891,7 +985,126 @@ input[type="file"] {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 12px;
+  padding-bottom: 24px;
+}
+
+.featured-projects {
+  display: grid;
+  gap: 24px;
+}
+
+.project-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: stretch;
+  padding: 24px;
+  border: var(--rule);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 90ms linear, border-color 90ms linear;
+}
+
+.project-card:hover {
+  background: var(--blue-wash);
+  border-color: var(--blue);
+}
+
+.project-card.is-expanded {
+  border-color: var(--blue);
+}
+
+.project-card-reversed .project-media {
+  order: 2;
+}
+
+.project-media {
+  position: relative;
+  display: grid;
+  min-height: 280px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.project-media .carousel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Inside a card the frame is sized by the card's height, so the 16/9
+   aspect-ratio has to be released — left in place it computes a width wider
+   than the column, overflows, and gets clipped by .project-media's
+   overflow:hidden (which was silently eating the next-image arrow). */
+.project-media .carousel-frame,
+.project-media .carousel-single img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+}
+
+.project-media-empty {
+  display: grid;
+  place-items: center;
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--ink-3);
+}
+
+.project-content {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 18px;
+  padding: 8px 8px 8px 0;
+}
+
+.project-content .work-desc {
+  margin-top: 0;
+}
+
+.project-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-stack span {
+  padding: 3px 7px;
+  border: var(--hair-ink);
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: var(--fs-label);
+}
+
+.project-year {
+  color: var(--ink-3);
+  font-size: var(--fs-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.project-expand {
+  color: var(--blue-deep);
+  font-size: var(--fs-body);
+}
+
+.project-card:hover .project-expand {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.project-details {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  max-width: 76ch;
+  padding: 28px 18px 8px;
+  border-top: var(--hair-ink);
+  font-size: var(--fs-body);
+  line-height: 1.7;
 }
 
 /* Entry layout — used while the index is short. A table's column headers are
@@ -1057,38 +1270,168 @@ input[type="file"] {
   transform: translateX(3px);
 }
 
-/* ---------- Infrastructure ---------- */
+/* ---------- Project carousel ---------- */
 
-.infra {
-  margin-top: 72px;
-  padding-block: 36px;
+.carousel {
+  margin-top: 20px;
+  max-width: 640px;
 }
 
-.infra-grid {
+.carousel-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: var(--rule);
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 420ms ease;
+}
+
+.carousel-single img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: var(--rule);
+  background: var(--panel);
+}
+
+.carousel-toggle {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: var(--hair-w) solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: var(--hair-w) solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.carousel-previous { left: 10px; }
+.carousel-next { right: 10px; }
+
+.carousel-control:hover,
+.carousel-toggle:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.carousel-dot {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.carousel-dot::after {
+  position: absolute;
+  inset: 15px 0;
+  content: "";
+  background: var(--panel-2);
+}
+
+.carousel-dot.is-active::after {
+  background: var(--blue);
+}
+
+/* ---------- Contact ---------- */
+
+.contact {
+  margin-top: 88px;
+  padding-block: 48px;
   border-top: var(--rule);
 }
 
-.infra-item {
+.contact-layout {
   display: grid;
-  gap: 8px;
-  align-content: start;
-  padding: 32px 40px 40px 0;
-  border-bottom: var(--hair-ink);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: 72px;
+  align-items: start;
+  padding-top: 24px;
 }
 
-.infra-name {
+.contact-intro {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+.contact-lede {
+  max-width: 30ch;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.contact-direct {
+  font-size: var(--fs-body);
+  color: var(--blue-deep);
+}
+
+.contact-form {
+  display: grid;
+  gap: 16px;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-form .btn {
+  justify-self: start;
+}
+
+.contact-sent {
+  padding: 24px 0;
   font-size: var(--fs-title-sm);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ink);
-}
-
-.infra-desc {
-  font-size: var(--fs-body);
-  color: var(--ink);
-  max-width: 34ch;
 }
 
 /* ---------- Colophon ---------- */
@@ -1128,12 +1471,28 @@ input[type="file"] {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
+  .contact-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
   .masthead-main {
     grid-template-columns: minmax(0, 1fr);
     gap: 36px;
   }
   .portrait {
-    width: min(240px, 45vw);
+    width: min(280px, 50vw);
+  }
+  /* Two columns inside a card stop working well before the page itself needs
+     to stack — the media and the title both get squeezed. */
+  .project-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .project-card-reversed .project-media {
+    order: 0;
+  }
+  .project-content {
+    padding: 0;
   }
 }
 
@@ -1147,6 +1506,7 @@ input[type="file"] {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     padding-top: 0;
   }
+  .project-card { gap: 28px; }
 }
 
 @media (max-width: 860px) {
@@ -1161,7 +1521,6 @@ input[type="file"] {
     display: none;
   }
   .masthead { padding-top: 56px; }
-  .masthead-meta { margin-top: 48px; }
   .work { margin-top: 64px; }
 }
 
@@ -1172,5 +1531,14 @@ input[type="file"] {
   .home, .page, .page-narrow { width: min(100% - 32px, var(--measure)); }
   :root { --sheet-pad: 16px; }
   .work-entry { padding: 32px 0; gap: 20px; }
+  .project-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 12px;
+  }
+  .project-card-reversed .project-media { order: 0; }
+  .project-media { min-height: 0; aspect-ratio: 16 / 9; }
+  .project-content { padding: 8px 4px 12px; }
   .colophon > span:last-child { margin-left: 0; }
 }
+

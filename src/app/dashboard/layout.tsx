@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AsciiField from "@/components/field/AsciiField";
+import ThemeToggle from "@/components/ThemeToggle";
 import { logout } from "./actions";
 
 /* The private side runs on the same ground, field and sheets as the public
@@ -34,7 +35,11 @@ export default function DashboardLayout({
                             <Link href="/dashboard/status" className="navbar-link">
                                 Status
                             </Link>
+                            <Link href="/dashboard/messages" className="navbar-link">
+                                Messages
+                            </Link>
                         </nav>
+                        <ThemeToggle />
                         <form action={logout}>
                             <button type="submit" className="btn btn-ghost btn-sm">
                                 Sign out

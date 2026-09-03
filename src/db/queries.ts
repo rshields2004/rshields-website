@@ -1,6 +1,5 @@
-import { stat } from "fs";
 import { db } from "./index";
-import { projects } from "./schema";
+import { projects, contactMessages } from "./schema";
 import { eq, asc, desc } from "drizzle-orm";
 
 
@@ -10,10 +9,12 @@ export async function getPublishedProjects() {
         title: projects.title,
         slug: projects.slug,
         shortDescription: projects.shortDescription,
+        description: projects.description,
         techStack: projects.techStack,
         repoUrl: projects.repoUrl,
         liveUrl: projects.liveUrl,
         thumbnailPath: projects.thumbnailPath,
+        images: projects.images,
         publishedAt: projects.publishedAt,
     })
     .from(projects)
@@ -38,4 +39,10 @@ export async function getAllProjects() {
 export async function getProjectById(id: number) {
     const [row] = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
     return row ?? null;
+}
+
+export async function getContactMessages() {
+    return db.select()
+        .from(contactMessages)
+        .orderBy(desc(contactMessages.createdAt));
 }
